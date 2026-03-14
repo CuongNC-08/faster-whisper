@@ -24,7 +24,7 @@ jobs:
             
             git pull origin main
             
-            aws s3 sync s3://my-whisper-models/latest/ ./models/latest/ --delete
+            aws s3 sync s3://engconnect-media-storage/Whisper_Faster_Model/ ./models/latest/ --delete
             
             source venv/bin/activate
             pip install -r requirements.txt
