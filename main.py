@@ -1,27 +1,32 @@
 import os
 import shutil
+import tempfile
 from fastapi import FastAPI, UploadFile, File
 from faster_whisper import WhisperModel
-import uvicorn
 
 app = FastAPI()
 
+# Khởi tạo model (nên để bên ngoài để load 1 lần duy nhất)
 MODEL_PATH = "./models/latest" 
-print(f"⚠️ Chuyển sang CPU (INT8 tối ưu)...")
 model = WhisperModel(MODEL_PATH, device="cuda", compute_type="float16")
-# model = WhisperModel("tiny", device="cuda", compute_type="float16")
 
 @app.post("/transcribe")
 async def transcribe_api(file: UploadFile = File(...)):
-    temp_path = f"temp_{file.filename}"
-    with open(temp_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    suffix = os.path.splitext(file.filename)[1]
+    
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+        shutil.copyfileobj(file.file, tmp)
+        temp_path = tmp.name
 
     try:
         segments, _ = model.transcribe(temp_path, language="vi", beam_size=5)
+        
         text = " ".join([s.text for s in segments]).strip()
         
-        return {"filename": file.filename, "transcription": text}
+        return {
+            "filename": file.filename, 
+            "transcription": text
+        }
     
     except Exception as e:
         return {"error": str(e)}
@@ -29,6 +34,3 @@ async def transcribe_api(file: UploadFile = File(...)):
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
