@@ -7,7 +7,7 @@ import logging
 app = FastAPI()
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("uvicorn.error")
 MODEL_PATH = "./models/latest" 
 model = WhisperModel(MODEL_PATH, device="cuda", compute_type="float16")
 
