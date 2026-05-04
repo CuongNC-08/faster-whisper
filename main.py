@@ -5,7 +5,6 @@ from fastapi import FastAPI, UploadFile, File
 from faster_whisper import WhisperModel
 import logging
 app = FastAPI()
-# import uvicorn
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -40,5 +39,3 @@ async def transcribe_api(file: UploadFile = File(...)):
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
-# if __name__ == "__main__":
-#     uvicorn.run("main:app", host="0.0.0.0", port=8080)
