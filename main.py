@@ -9,7 +9,6 @@ app = FastAPI()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 MODEL_PATH = "./models/latest" 
-# MODEL_PATH = "D:\Project\Whisper_Faster_Model"
 model = WhisperModel(MODEL_PATH, device="cuda", compute_type="float16")
 
 @app.post("/transcribe")
